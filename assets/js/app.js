@@ -99,6 +99,7 @@ if (form) {
       mensagem += `Endereço: ${endereco || 'Não informado'}\n`;
       mensagem += `Serviço: ${servicos[servico] || servico}\n`;
       mensagem += `Valor estimado: R$ ${valorEstimado.toFixed(2).replace('.', ',')}\n`;
+      mensagem += `Observação: valor sujeito a alteração conforme avaliação do local.\n`;
       mensagem += `Detalhes: ${observacoes || 'Nenhum detalhe informado'}\n`;
 
       if (file) {
@@ -116,13 +117,13 @@ if (form) {
 
         if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
           if (statusMessage) {
-            statusMessage.textContent = 'Abrindo o WhatsApp com a foto...';
+            statusMessage.textContent = 'Abrindo o compartilhamento do celular com a foto...';
           }
 
           try {
             await navigator.share(shareData);
             if (statusMessage) {
-              statusMessage.textContent = 'Foto enviada pelo compartilhamento do celular.';
+              statusMessage.textContent = 'Compartilhamento concluído. Se necessário, finalize o envio no WhatsApp.';
             }
             return;
           } catch (shareError) {
@@ -133,7 +134,7 @@ if (form) {
 
       const url = `https://wa.me/${DEFAULT_NUMBER}?text=${encodeURIComponent(mensagem)}`;
       if (statusMessage) {
-        statusMessage.textContent = 'Abrindo o WhatsApp...';
+        statusMessage.textContent = 'O navegador não conseguiu anexar a foto automaticamente. O WhatsApp será aberto para você anexar a imagem manualmente.';
       }
       window.open(url, '_blank', 'noopener,noreferrer');
     } catch (error) {
