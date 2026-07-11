@@ -107,21 +107,28 @@ if (form) {
         mensagem += `\nImagem anexada: Nenhuma`;
       }
 
-      if (file && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        if (statusMessage) {
-          statusMessage.textContent = 'Compartilhando a foto com o WhatsApp...';
-        }
-
-        await navigator.share({
+      if (file) {
+        const shareData = {
           files: [file],
           title: 'Novo orçamento',
           text: mensagem
-        });
+        };
 
-        if (statusMessage) {
-          statusMessage.textContent = 'Foto compartilhada. Se necessário, finalize o envio no WhatsApp.';
+        if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+          if (statusMessage) {
+            statusMessage.textContent = 'Abrindo o WhatsApp com a foto...';
+          }
+
+          try {
+            await navigator.share(shareData);
+            if (statusMessage) {
+              statusMessage.textContent = 'Foto enviada pelo compartilhamento do celular.';
+            }
+            return;
+          } catch (shareError) {
+            console.warn('Falha no compartilhamento nativo:', shareError);
+          }
         }
-        return;
       }
 
       const url = `https://wa.me/${DEFAULT_NUMBER}?text=${encodeURIComponent(mensagem)}`;
