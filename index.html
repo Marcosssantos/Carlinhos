@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+  <title>C.P. Jardinagem | Orçamento rápido</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div class="hero-badge">C.P. Jardinagem</div>
+      <h1>Orçamento rápido pelo WhatsApp</h1>
+      <p>Preencha em poucos passos e envie direto para nossa equipe.</p>
+      <a href="#orcamento" class="btn">Fazer orçamento</a>
+    </header>
+
+    <main>
+      <section id="orcamento" class="card">
+        <div class="card-head">
+          <h2>Solicitar orçamento</h2>
+          <p>Escolha o tipo de serviço e envie tudo direto para o WhatsApp.</p>
+        </div>
+
+        <form id="orcamento-form">
+          <div class="section-title">1. Dados do cliente</div>
+          <label for="nome">Seu nome</label>
+          <input id="nome" type="text" name="nome" placeholder="Ex.: Ana" required>
+
+          <label for="whatsapp">WhatsApp</label>
+          <input id="whatsapp" type="tel" name="whatsapp" placeholder="Ex.: 11999999999" required>
+
+          <div class="section-title">2. Tipo de projeto</div>
+          <div class="service-options">
+            <label class="service-card">
+              <input type="radio" name="servico" value="manutencao" checked>
+              <span>Manutenção</span>
+            </label>
+            <label class="service-card">
+              <input type="radio" name="servico" value="jardim">
+              <span>Jardim novo</span>
+            </label>
+            <label class="service-card">
+              <input type="radio" name="servico" value="premium">
+              <span>Premium</span>
+            </label>
+          </div>
+
+          <label for="metros">Área</label>
+          <input id="metros" type="number" name="metros" min="1" placeholder="Ex.: 40" required>
+
+          <label for="endereco">Endereço do local</label>
+          <input id="endereco" type="text" name="endereco" placeholder="Ex.: Rua das Flores, 123 - Centro">
+
+          <div class="section-title">3. Detalhes</div>
+          <textarea id="observacoes" name="observacoes" rows="3" placeholder="Descreva o que você precisa"></textarea>
+
+          <div class="section-title">4. Foto do local</div>
+          <div class="upload-box">
+            <input id="foto" type="file" name="foto" accept="image/*" capture="environment" hidden>
+            <div class="upload-actions">
+              <button type="button" id="foto-camera-btn" class="upload-btn">Tirar foto</button>
+              <button type="button" id="foto-galeria-btn" class="upload-btn upload-btn-secondary">Escolher da galeria</button>
+            </div>
+          </div>
+
+          <div id="foto-preview" class="foto-preview"></div>
+          <div id="status-message" class="status-message" aria-live="polite"></div>
+
+          <button type="submit" class="submit-btn">Enviar pelo WhatsApp</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
