@@ -92,17 +92,6 @@ if (form) {
     }
 
     try {
-      const response = await fetch('api/salvar_orcamento.php', {
-        method: 'POST',
-        body: formData
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || 'Não foi possível processar o orçamento.');
-      }
-
       let mensagem = `Olá! Novo orçamento recebido:\n`;
       mensagem += `Nome: ${nome || 'Não informado'}\n`;
       mensagem += `WhatsApp: ${whatsapp || 'Não informado'}\n`;
@@ -112,24 +101,32 @@ if (form) {
       mensagem += `Valor estimado: R$ ${valorEstimado.toFixed(2).replace('.', ',')}\n`;
       mensagem += `Detalhes: ${observacoes || 'Nenhum detalhe informado'}\n`;
 
-      if (data.image_url) {
-        mensagem += `\nFoto do local: ${data.image_url}`;
-      } else if (file) {
-        mensagem += `\nImagem anexada: ${file.name}`;
+      if (file) {
+        mensagem += `\nFoto do local anexada no compartilhamento.`;
       } else {
         mensagem += `\nImagem anexada: Nenhuma`;
       }
 
-      if (data.sent_via_api) {
+      if (file && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
         if (statusMessage) {
-          statusMessage.textContent = 'Mensagem enviada pelo WhatsApp!';
+          statusMessage.textContent = 'Compartilhando a foto com o WhatsApp...';
+        }
+
+        await navigator.share({
+          files: [file],
+          title: 'Novo orçamento',
+          text: mensagem
+        });
+
+        if (statusMessage) {
+          statusMessage.textContent = 'Foto compartilhada. Se necessário, finalize o envio no WhatsApp.';
         }
         return;
       }
 
       const url = `https://wa.me/${DEFAULT_NUMBER}?text=${encodeURIComponent(mensagem)}`;
       if (statusMessage) {
-        statusMessage.textContent = 'Abrindo o WhatsApp com a imagem...';
+        statusMessage.textContent = 'Abrindo o WhatsApp...';
       }
       window.open(url, '_blank', 'noopener,noreferrer');
     } catch (error) {
