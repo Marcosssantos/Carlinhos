@@ -48,7 +48,7 @@ if (imageInput && imagePreview) {
 }
 
 if (form) {
-  form.addEventListener('submit', (event) => {
+  form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     const nome = document.getElementById('nome').value.trim();
@@ -75,27 +75,68 @@ if (form) {
 
     const valorEstimado = Number(metros || 0) * (valores[servico] || 15);
 
-    let mensagem = `Olá! Novo orçamento recebido:\n`;
-    mensagem += `Nome: ${nome || 'Não informado'}\n`;
-    mensagem += `WhatsApp: ${whatsapp || 'Não informado'}\n`;
-    mensagem += `Área: ${metros || 'Não informada'} m²\n`;
-    mensagem += `Endereço: ${endereco || 'Não informado'}\n`;
-    mensagem += `Serviço: ${servicos[servico] || servico}\n`;
-    mensagem += `Valor estimado: R$ ${valorEstimado.toFixed(2).replace('.', ',')}\n`;
-    mensagem += `Detalhes: ${observacoes || 'Nenhum detalhe informado'}\n`;
+    const formData = new FormData();
+    formData.append('nome', nome);
+    formData.append('whatsapp', whatsapp);
+    formData.append('metros', metros);
+    formData.append('endereco', endereco);
+    formData.append('servico', servico);
+    formData.append('observacoes', observacoes);
 
     if (file) {
-      mensagem += `Imagem anexada: ${file.name}`;
-    } else {
-      mensagem += `Imagem anexada: Nenhuma`;
+      formData.append('foto', file);
     }
-
-    const url = `https://wa.me/${DEFAULT_NUMBER}?text=${encodeURIComponent(mensagem)}`;
 
     if (statusMessage) {
-      statusMessage.textContent = 'Abrindo o WhatsApp...';
+      statusMessage.textContent = 'Enviando imagem e abrindo o WhatsApp...';
     }
 
-    window.open(url, '_blank', 'noopener,noreferrer');
+    try {
+      const response = await fetch('api/salvar_orcamento.php', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Não foi possível processar o orçamento.');
+      }
+
+      let mensagem = `Olá! Novo orçamento recebido:\n`;
+      mensagem += `Nome: ${nome || 'Não informado'}\n`;
+      mensagem += `WhatsApp: ${whatsapp || 'Não informado'}\n`;
+      mensagem += `Área: ${metros || 'Não informada'} m²\n`;
+      mensagem += `Endereço: ${endereco || 'Não informado'}\n`;
+      mensagem += `Serviço: ${servicos[servico] || servico}\n`;
+      mensagem += `Valor estimado: R$ ${valorEstimado.toFixed(2).replace('.', ',')}\n`;
+      mensagem += `Detalhes: ${observacoes || 'Nenhum detalhe informado'}\n`;
+
+      if (data.image_url) {
+        mensagem += `\nFoto do local: ${data.image_url}`;
+      } else if (file) {
+        mensagem += `\nImagem anexada: ${file.name}`;
+      } else {
+        mensagem += `\nImagem anexada: Nenhuma`;
+      }
+
+      if (data.sent_via_api) {
+        if (statusMessage) {
+          statusMessage.textContent = 'Mensagem enviada pelo WhatsApp!';
+        }
+        return;
+      }
+
+      const url = `https://wa.me/${DEFAULT_NUMBER}?text=${encodeURIComponent(mensagem)}`;
+      if (statusMessage) {
+        statusMessage.textContent = 'Abrindo o WhatsApp com a imagem...';
+      }
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      if (statusMessage) {
+        statusMessage.textContent = error.message || 'Não foi possível abrir o WhatsApp.';
+      }
+      console.error(error);
+    }
   });
 }
