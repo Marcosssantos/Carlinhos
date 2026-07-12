@@ -1,4 +1,4 @@
-const DEFAULT_NUMBER = '5511983657862';
+const DEFAULT_NUMBER = '5511973495997';
 
 const form = document.getElementById('orcamento-form');
 const imageInput = document.getElementById('foto');
